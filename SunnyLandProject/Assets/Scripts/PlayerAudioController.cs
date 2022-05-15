@@ -4,18 +4,41 @@ using UnityEngine;
 
 public class PlayerAudioController : MonoBehaviour
 {
+    
+    AudioSource[] allAudioSources;
+    AudioSource cherry;
+    AudioSource crouching;
+    AudioSource footsteps;
+    AudioSource landing;
+    AudioSource jumping;
+
     // keep track of the jumping state ... 
     bool isJumping = false;
     // make sure to keep track of the movement as well !
+    bool isMoving = false;
+
+    float jumpingPitch = 1.0f;
+    float landingPitch = 1.0f;
 
     Rigidbody2D rb; // note the "2D" prefix 
     
     // Start is called before the first frame update
+
     void Start()
     {
-	rb = GetComponent<Rigidbody2D>();
-	// get the references to your audio sources here !        
+        rb = GetComponent<Rigidbody2D>();
+        allAudioSources = GetComponents<AudioSource>();
+        cherry = allAudioSources[1];
+        crouching = allAudioSources[3];
+        footsteps = allAudioSources[2];
+        landing = allAudioSources[4];
+        jumping = allAudioSources[5];
+        
+        
     }
+
+
+        
 
     // FixedUpdate is called whenever the physics engine updates
     void FixedUpdate()
@@ -33,11 +56,36 @@ public class PlayerAudioController : MonoBehaviour
 	// } else if ( ??? < 1 &&) {
 	//   stop sound here !
 	// }	
+    
+
+   
+        float v = rb.velocity.magnitude;
+    if(v>1 && isMoving && !isJumping){
+        footsteps.Play();
+        isMoving = true;
     }
+    else if(v>1 && isMoving && !isJumping){
+        footsteps.Stop();
+        isMoving = false;
+    
+    }
+    }
+
     
     // trigger your landing sound here !
     public void OnLanding() {
+        int randomnumber = Random.Range(0, 100);
+        float randomModifier =Random.Range(0.1f, 1.9f);
+        float finalPitch = landingPitch * randomModifier;
+
+        if(randomnumber < 50 )
+        {
+            landing.pitch = finalPitch;
+        }
+
         isJumping = false;
+        landing.Play();
+        footsteps.Stop();
         print("the fox has landed");
 	// to keep things cleaner, you might want to
 	// play this sound only when the fox actually jumoed ...
@@ -45,17 +93,30 @@ public class PlayerAudioController : MonoBehaviour
 
     // trigger your crouching sound here
     public void OnCrouching() {
+        crouching.Play();
         print("the fox is crouching");
     }
  
     // trigger your jumping sound here !
     public void OnJump() {
+
+         int randomnumber = Random.Range(0, 100);
+        float randomModifier =Random.Range(0.1f, 1.9f);
+        float finalPitch = jumpingPitch * randomModifier;
+
+        if(randomnumber < 50 )
+        {
+            jumping.pitch = finalPitch;
+        }
         isJumping = true;
+        jumping.Play();
+        footsteps.Stop();
         print("the fox has jumped");
     }
 
     // trigger your cherry collection sound here !
     public void OnCherryCollect() {
+        cherry.Play();
         print("the fox has collected a cherry");
     }
 }
